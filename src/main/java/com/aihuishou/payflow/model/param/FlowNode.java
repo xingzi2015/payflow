@@ -13,10 +13,10 @@ public class FlowNode implements Serializable {
     private String id;
     private Boolean start = Boolean.FALSE;
     private Boolean end = Boolean.FALSE;
-
+    //执行命令
     private String createExp;
+    //条件
     private NodeCondition[] conditions;
-    private String runnerId;
     //默认两次重试
     private Integer retryTimes=2;
     //发送延迟，默认无延迟
@@ -28,4 +28,6 @@ public class FlowNode implements Serializable {
     // following generate by system
     @JsonIgnore
     private NodeAction nodeAction;
+
+    private String flowName;
 }

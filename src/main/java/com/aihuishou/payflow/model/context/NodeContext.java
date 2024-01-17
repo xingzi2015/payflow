@@ -24,6 +24,4 @@ public class NodeContext implements Serializable {
     private Map<String, Object> dataMap;
 
     private Integer tryTimes;
-
-    private String flowName;
 }

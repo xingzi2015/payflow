@@ -32,7 +32,6 @@ public class FlowContext {
     @Getter
     private static Executor defaultExecutor;
     private static Map<String, Flow> flowMap;
-
     private static Map<String, FlowNode> flowNodeMap;
 
     /**
@@ -67,6 +66,7 @@ public class FlowContext {
                 flowNodeMap.put(flow.getName() + "_" + flowNode.getId(), flowNode);
                 //赋值每个流程需要做的事
                 flowNode.setNodeAction(flowParser.parse(flowNode.getCreateExp(), NodeAction.class));
+                flowNode.setFlowName(flow.getName());
                 if (flowNode.getConditions() != null) {
                     for (NodeCondition nodeCondition : flowNode.getConditions()) {
                         Optional.of(nodeCondition).map(NodeCondition::getNodeWhens)

@@ -49,7 +49,6 @@ public class FlowEngineImpl implements FlowEngine {
             .executeId(UUID.randomUUID().toString())
             .dataMap(dataMap)
             .tryTimes(0)
-            .flowName(flowName)
             .build();
         //TODO 数据库插入 FLOW
         executeNextNode(List.of(Pair.of(flowNode, nodeContext)));
@@ -91,7 +90,6 @@ public class FlowEngineImpl implements FlowEngine {
                         .preResult(nodeContext.getActionResult())
                         .dataMap(nodeContext.getDataMap())
                         .tryTimes(0)
-                        .flowName(nodeContext.getFlowName())
                         .build())).collect(Collectors.toList());
 
             nodeContext.setNextNodes(nodePairs.stream().map(Pair::getRight).toArray(NodeContext[]::new));
@@ -109,6 +107,7 @@ public class FlowEngineImpl implements FlowEngine {
                     //生成 NodeMessage
                     NodeMessage nodeMessage = new NodeMessage();
                     nodeMessage.setId(nodePair.getLeft().getId());
+                    nodeMessage.setFlowName(nodePair.getLeft().getFlowName());
                     BeanUtils.copyProperties(nodePair.getRight(), nodeMessage);
                     //MQ发送
                     normalMessageProducer.sendMessage(objectMapper.writeValueAsString(nodeMessage),
