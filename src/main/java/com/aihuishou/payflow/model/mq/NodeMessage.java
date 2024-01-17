@@ -1,6 +1,5 @@
 package com.aihuishou.payflow.model.mq;
 
-import com.aihuishou.payflow.model.param.NodeCondition;
 import lombok.Data;
 
 import java.util.Map;

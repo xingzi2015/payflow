@@ -1,7 +1,6 @@
 package com.aihuishou.payflow.handler;
 
 import com.aihuishou.payflow.enums.StatusEnum;
-import com.aihuishou.payflow.model.context.NodeContext;
 import com.aihuishou.payflow.model.param.Flow;
 
 public interface FlowHandler {
