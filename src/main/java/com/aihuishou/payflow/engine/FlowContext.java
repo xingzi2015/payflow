@@ -4,6 +4,8 @@ import com.aihuishou.payflow.action.NodeAction;
 import com.aihuishou.payflow.action.NodeConditionAction;
 import com.aihuishou.payflow.algorithm.RetryAlgorithm;
 import com.aihuishou.payflow.engine.FlowParam.Runner;
+import com.aihuishou.payflow.handler.ActionPostHandler;
+import com.aihuishou.payflow.handler.ActionPreHandler;
 import com.aihuishou.payflow.model.param.Flow;
 import com.aihuishou.payflow.model.param.FlowNode;
 import com.aihuishou.payflow.model.param.NodeCondition;
@@ -11,6 +13,7 @@ import com.aihuishou.payflow.model.parser.FlowParser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -30,11 +33,17 @@ public class FlowContext {
 
     private final FlowParam flowParam;
     private final FlowParser flowParser;
+    private final ApplicationContext applicationContext;
 
     @Getter
     private static Executor defaultExecutor;
     private static Map<String, Flow> flowMap;
     private static Map<String, FlowNode> flowNodeMap;
+
+    @Getter
+    private static List<ActionPreHandler> actionPreHandlers;
+    @Getter
+    private static List<ActionPostHandler> actionPostHandlers;
 
     /**
      * 加载 FLow
@@ -43,8 +52,8 @@ public class FlowContext {
     public void init() {
         initRunner();
         initFlows();
+        initHandler();
     }
-
 
     private void initRunner() {
         Optional<Runner> runnerOptional = Optional.of(flowParam).map(FlowParam::getRunner);
@@ -54,7 +63,7 @@ public class FlowContext {
 
     private void initFlows() {
         flowMap = new HashMap<>();
-        flowNodeMap =new HashMap<>();
+        flowNodeMap = new HashMap<>();
         for (Flow flow : flowParam.getFlows()) {
             //nodeMap 用于存储NodeId 和 node 的映射关系
             Map<String, FlowNode> nodeMap = new HashMap<>();
@@ -68,7 +77,7 @@ public class FlowContext {
                 flowNodeMap.put(flow.getName() + "_" + flowNode.getId(), flowNode);
                 //赋值每个流程需要做的事
                 flowNode.setNodeAction(flowParser.parse(flowNode.getCreateExp(), NodeAction.class));
-                if(StringUtils.isNotEmpty(flowNode.getRetryAlgorithmExp())){
+                if (StringUtils.isNotEmpty(flowNode.getRetryAlgorithmExp())) {
                     flowNode.setRetryAlgorithm(flowParser.parse(flowNode.getRetryAlgorithmExp(), RetryAlgorithm.class));
                 }
                 flowNode.setFlowName(flow.getName());
@@ -95,6 +104,14 @@ public class FlowContext {
         }
     }
 
+
+    private void initHandler() {
+        Map<String, ActionPreHandler> actionPreHandlerMap = applicationContext.getBeansOfType(ActionPreHandler.class);
+        actionPreHandlers = actionPreHandlerMap.values().stream().toList();
+
+        Map<String, ActionPostHandler> actionPostHandlerMap = applicationContext.getBeansOfType(ActionPostHandler.class);
+        actionPostHandlers = actionPostHandlerMap.values().stream().toList();
+    }
 
     public static Flow getFlow(String flowName) {
         return flowMap.get(flowName);

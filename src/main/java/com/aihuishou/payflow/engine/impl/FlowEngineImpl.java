@@ -3,6 +3,7 @@ package com.aihuishou.payflow.engine.impl;
 import com.aihuishou.payflow.action.NodeAction;
 import com.aihuishou.payflow.engine.FlowContext;
 import com.aihuishou.payflow.engine.FlowEngine;
+import com.aihuishou.payflow.handler.ActionPreHandler;
 import com.aihuishou.payflow.model.context.NodeContext;
 import com.aihuishou.payflow.model.mq.NodeMessage;
 import com.aihuishou.payflow.model.param.Flow;
@@ -60,8 +61,10 @@ public class FlowEngineImpl implements FlowEngine {
         NodeAction nodeAction = node.getNodeAction();
         try {
             //TODO 幂等逻辑，前置AOP 操作，数据库插入 NODE
+            FlowContext.getActionPreHandlers().forEach(actionPreHandler -> actionPreHandler.preHandle(node,nodeContext));
             Object result = nodeAction.execute(nodeContext);
             //TODO 后置 AOP 操作,数据库更新 NODE 状态=成功
+            FlowContext.getActionPostHandlers().forEach(actionPreHandler -> actionPreHandler.postHandle(node,nodeContext));
 
             nodeContext.setActionResult(result);
             //执行成功，再次初始化延迟

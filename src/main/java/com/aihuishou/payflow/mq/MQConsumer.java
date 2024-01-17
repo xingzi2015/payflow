@@ -33,19 +33,16 @@ public class MQConsumer {
         consumer.subscribe("test_mq2_sijun", "*");
 
         // 注册消息监听器
-        consumer.registerMessageListener(new MessageListenerConcurrently() {
-            @Override
-            public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> messages, ConsumeConcurrentlyContext context) {
-                try {
-                    for (MessageExt message : messages) {
-                        String receiveMessage =new String(message.getBody());
-                        flowEngine.handleMQMessage(receiveMessage);
-                    }
-                }catch (Exception e){
-                    log.error(e.getMessage(),e);
+        consumer.registerMessageListener((MessageListenerConcurrently) (messages, context) -> {
+            try {
+                for (MessageExt message : messages) {
+                    String receiveMessage =new String(message.getBody());
+                    flowEngine.handleMQMessage(receiveMessage);
                 }
-                return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
+            }catch (Exception e){
+                log.error(e.getMessage(),e);
             }
+            return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
         });
 
         // 启动消费者

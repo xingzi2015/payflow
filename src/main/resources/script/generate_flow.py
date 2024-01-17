@@ -17,10 +17,8 @@ def parse_yaml(file_path):
 def extract_action_name(input_string):
     # 使用正则表达式匹配目标字符串
     match = re.search(r'\.([^.]*)\(\)', input_string)
-
     # 如果匹配成功，返回提取的字符串，否则返回 None
     return match.group(1) if match else None
-
 
 def generate_flowchart():
     for flow in parsed_data['payflow']['flows']:
@@ -38,7 +36,6 @@ def generate_flowchart():
                     if (condition is None):
                         when = ''
                     else:
-                        # 提取 'node-whens' 列表中的 'create-exp' 值
                         create_exp_list = ["Not ("+extract_action_name(item['create-exp'])+")" if item.get('is-negated') else extract_action_name(item['create-exp']) for item in condition.get('node-whens', [])]
                         when = ', '.join(create_exp_list)
                     for to_node in condition['to-nodes']:
@@ -48,7 +45,6 @@ def generate_flowchart():
         flowchart.render(filename='src/main/resources/image/'+flow['name'], format='png', cleanup=True)
 
 if __name__ == '__main__':
-    # 示例使用：假设您有一个名为 'payflow.yml' 的 YAML 文件
     file_path = 'src/main/resources/application.yml'
     parsed_data = parse_yaml(file_path)
     generate_flowchart()
