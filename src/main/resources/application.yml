@@ -1,0 +1,49 @@
+payflow:
+  runner:
+    create-exp: 'T(java.util.concurrent.Executors).newFixedThreadPool(2)'
+  flows:
+    - name: 'flow1'
+      nodes:
+        - id: 'a1'
+          start: true
+          create-exp: 'new com.aihuishou.payflow.action.impl.A1NodeActionImpl()'
+          conditions:
+            - node-whens:
+                - create-exp: 'new com.aihuishou.payflow.action.impl.ToA2ConditionAction()'
+              to-nodes:
+                - 'a2'
+            - node-whens:
+                - create-exp: 'new com.aihuishou.payflow.action.impl.ToA3ConditionAction()'
+              to-nodes:
+                - 'a3'
+        - id: 'a2'
+          create-exp: 'new com.aihuishou.payflow.action.impl.A2NodeActionImpl()'
+          end: false
+          conditions:
+            - node-whens:
+                - create-exp: 'new com.aihuishou.payflow.action.impl.ToA6ConditionAction()'
+              to-nodes:
+                - 'a2'
+            - node-whens:
+                - create-exp: 'new com.aihuishou.payflow.action.impl.ToA6ConditionAction()'
+                  is-negated: true
+              to-nodes:
+                - 'a6'
+        - id: 'a3'
+          create-exp: 'new com.aihuishou.payflow.action.impl.A3NodeActionImpl()'
+          delay-level: 1
+          conditions:
+            - node-whens:
+                - create-exp: 'new com.aihuishou.payflow.action.impl.ToA4A5ConditionAction()'
+              to-nodes:
+                - 'a4'
+                - 'a5'
+        - id: 'a4'
+          create-exp: 'new com.aihuishou.payflow.action.impl.A4NodeActionImpl()'
+          end: true
+        - id: 'a5'
+          create-exp: 'new com.aihuishou.payflow.action.impl.A5NodeActionImpl()'
+          end: true
+        - id: 'a6'
+          create-exp: 'new com.aihuishou.payflow.action.impl.A6NodeActionImpl()'
+          end: true
