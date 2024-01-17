@@ -12,7 +12,9 @@ import java.io.Serializable;
 public class FlowNode implements Serializable {
 
     private String id;
+    //开始节点
     private Boolean start = Boolean.FALSE;
+    //结束节点
     private Boolean end = Boolean.FALSE;
     //执行命令
     private String createExp;
@@ -31,8 +33,7 @@ public class FlowNode implements Serializable {
     private NodeAction nodeAction;
     @JsonIgnore
     private RetryAlgorithm retryAlgorithm;
-
+    //流程名称
     private String flowName;
-
 
 }

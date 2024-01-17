@@ -15,4 +15,12 @@ public class NodeWhen implements Serializable {
     // following generate by system
     @JsonIgnore
     private NodeConditionAction conditionAction;
+
+    @Override
+    public String toString() {
+        return "NodeWhen{" +
+            "createExp='" + createExp + '\'' +
+            ", isNegated=" + isNegated +
+            '}';
+    }
 }
