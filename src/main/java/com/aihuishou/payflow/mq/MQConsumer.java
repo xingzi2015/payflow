@@ -30,7 +30,7 @@ public class MQConsumer {
         consumer.setNamesrvAddr("10.193.64.5:9876");
 
         // 订阅Topic和Tag
-        consumer.subscribe("test_mq_sijun", "*");
+        consumer.subscribe("test_mq2_sijun", "*");
 
         // 注册消息监听器
         consumer.registerMessageListener(new MessageListenerConcurrently() {
@@ -50,8 +50,6 @@ public class MQConsumer {
 
         // 启动消费者
         consumer.start();
-
-        System.out.println("Consumer started.");
     }
 
 

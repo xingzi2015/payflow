@@ -18,7 +18,7 @@ public class NormalMessageProducer {
         producer.start();
         try {
             // 创建消息实例，指定Topic、Tag和消息体
-            Message message = new Message("test_mq_sijun", "*", sendMsg.getBytes());
+            Message message = new Message("test_mq2_sijun", "*", sendMsg.getBytes());
             if (level > 0) {
                 message.setDelayTimeLevel(level);
             }

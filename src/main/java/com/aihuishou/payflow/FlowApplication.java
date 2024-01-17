@@ -10,7 +10,6 @@ public class FlowApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(FlowApplication.class, args);
-        System.out.println("Application started successfully.");
     }
 
 }

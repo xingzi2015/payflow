@@ -2,6 +2,7 @@ package com.aihuishou.payflow.engine;
 
 import com.aihuishou.payflow.action.NodeAction;
 import com.aihuishou.payflow.action.NodeConditionAction;
+import com.aihuishou.payflow.algorithm.RetryAlgorithm;
 import com.aihuishou.payflow.engine.FlowParam.Runner;
 import com.aihuishou.payflow.model.param.Flow;
 import com.aihuishou.payflow.model.param.FlowNode;
@@ -9,6 +10,7 @@ import com.aihuishou.payflow.model.param.NodeCondition;
 import com.aihuishou.payflow.model.parser.FlowParser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -66,6 +68,9 @@ public class FlowContext {
                 flowNodeMap.put(flow.getName() + "_" + flowNode.getId(), flowNode);
                 //赋值每个流程需要做的事
                 flowNode.setNodeAction(flowParser.parse(flowNode.getCreateExp(), NodeAction.class));
+                if(StringUtils.isNotEmpty(flowNode.getRetryAlgorithmExp())){
+                    flowNode.setRetryAlgorithm(flowParser.parse(flowNode.getRetryAlgorithmExp(), RetryAlgorithm.class));
+                }
                 flowNode.setFlowName(flow.getName());
                 if (flowNode.getConditions() != null) {
                     for (NodeCondition nodeCondition : flowNode.getConditions()) {

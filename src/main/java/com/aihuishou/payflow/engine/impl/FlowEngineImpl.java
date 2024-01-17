@@ -3,7 +3,6 @@ package com.aihuishou.payflow.engine.impl;
 import com.aihuishou.payflow.action.NodeAction;
 import com.aihuishou.payflow.engine.FlowContext;
 import com.aihuishou.payflow.engine.FlowEngine;
-import com.aihuishou.payflow.engine.FlowResult;
 import com.aihuishou.payflow.model.context.NodeContext;
 import com.aihuishou.payflow.model.mq.NodeMessage;
 import com.aihuishou.payflow.model.param.Flow;
@@ -41,7 +40,7 @@ public class FlowEngineImpl implements FlowEngine {
 
 
     @Override
-    public FlowResult execute(String flowName, Map<String, Object> dataMap) {
+    public void execute(String flowName, Map<String, Object> dataMap) {
 
         Flow flow = FlowContext.getFlow(flowName);
         FlowNode flowNode = flow.getStartNode();
@@ -49,10 +48,11 @@ public class FlowEngineImpl implements FlowEngine {
             .executeId(UUID.randomUUID().toString())
             .dataMap(dataMap)
             .tryTimes(0)
+            .delayLevel(flowNode.getDelayLevel())
             .build();
         //TODO 数据库插入 FLOW
+        log.info("开始执行");
         executeNextNode(List.of(Pair.of(flowNode, nodeContext)));
-        return null;
     }
 
     private void executeNode(FlowNode node, NodeContext nodeContext) {
@@ -62,19 +62,31 @@ public class FlowEngineImpl implements FlowEngine {
             //TODO 幂等逻辑，前置AOP 操作，数据库插入 NODE
             Object result = nodeAction.execute(nodeContext);
             //TODO 后置 AOP 操作,数据库更新 NODE 状态=成功
+
             nodeContext.setActionResult(result);
+            //执行成功，再次初始化延迟
+            nodeContext.setDelayLevel(node.getDelayLevel());
+
         } catch (Exception e) {
             nodeContext.setThrowable(e);
+            //进行重试
             if (nodeContext.getTryTimes() < node.getRetryTimes()) {
+                //重试策略
+                if (node.getRetryAlgorithm() != null) {
+                    node.getRetryAlgorithm().calculateSendLevel(nodeContext);
+                }
                 nodeContext.setTryTimes(nodeContext.getTryTimes() + 1);
-                executeNode(node, nodeContext);
+                log.warn("重试：重试次数：" + nodeContext.getTryTimes() + " 重试延迟：" + nodeContext.getDelayLevel());
+                executeNextNode(List.of(Pair.of(node, nodeContext)));
             } else {
                 //TODO 数据库更新，NODE 状态=失败， FLOW 状态=失败
-                //记数据库日志
+                log.error("节点执行失败");
             }
+            return;
         }
         if (node.getEnd()) {
             //TODO 数据库更新 FLOW 状态=成功
+            log.info("执行成功");
             return;
         }
         List<FlowNode> flowNodes = matchNextNode(node.getConditions(), nodeContext);
@@ -90,6 +102,7 @@ public class FlowEngineImpl implements FlowEngine {
                         .preResult(nodeContext.getActionResult())
                         .dataMap(nodeContext.getDataMap())
                         .tryTimes(0)
+                        .delayLevel(nodeContext.getDelayLevel())
                         .build())).collect(Collectors.toList());
 
             nodeContext.setNextNodes(nodePairs.stream().map(Pair::getRight).toArray(NodeContext[]::new));
@@ -111,10 +124,10 @@ public class FlowEngineImpl implements FlowEngine {
                     BeanUtils.copyProperties(nodePair.getRight(), nodeMessage);
                     //MQ发送
                     normalMessageProducer.sendMessage(objectMapper.writeValueAsString(nodeMessage),
-                        nodePair.getLeft().getDelayLevel());
+                        nodePair.getRight().getDelayLevel());
                 }
                 case THREAD_POOL -> {
-                    if (nodePair.getLeft().getDelayLevel() > 0) {
+                    if (nodePair.getRight().getDelayLevel() > 0) {
                         //TODO 根据不同的 delayLevel 发送消息
                         //本地延迟执行
                         scheduledExecutorService.schedule(() -> executeNode(nodePair.getLeft(), nodePair.getRight()),

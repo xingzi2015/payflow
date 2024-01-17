@@ -46,4 +46,6 @@ payflow:
           end: true
         - id: 'a6'
           create-exp: 'new com.aihuishou.payflow.action.impl.A6NodeActionImpl()'
+          retry-times: 10
+          retry-algorithm-exp: "new com.aihuishou.payflow.algorithm.impl.ExponentialBackoffRetryAlgorithm(5)"
           end: true

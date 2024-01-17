@@ -24,4 +24,19 @@ public class NodeContext implements Serializable {
     private Map<String, Object> dataMap;
 
     private Integer tryTimes;
+
+    private Integer delayLevel;
+
+    @Override
+    public String toString() {
+        return "NodeContext{" +
+            "executeId='" + executeId + '\'' +
+            ", preResult=" + preResult +
+            ", actionResult=" + actionResult +
+            ", throwable=" + throwable +
+            ", dataMap=" + dataMap +
+            ", tryTimes=" + tryTimes +
+            ", delayLevel=" + delayLevel +
+            '}';
+    }
 }
