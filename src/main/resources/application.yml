@@ -1,4 +1,4 @@
-payflow:
+pay-flow:
   runner:
     create-exp: 'T(java.util.concurrent.Executors).newFixedThreadPool(2)'
   flows:

@@ -9,7 +9,9 @@ import java.util.List;
 
 @Data
 public class NodeCondition implements Serializable {
+    //条件
     private NodeWhen[] nodeWhens;
+    //下个节点
     private String[] toNodes;
 
     // following generate by system

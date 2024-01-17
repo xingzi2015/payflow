@@ -13,7 +13,7 @@ public class A6NodeActionImpl implements NodeAction {
     @Override
     public Object execute(final NodeContext nodeContext) {
         final Map<String, Object> dataMap = nodeContext.getDataMap();
-        log.info("经过 a6 节点"+" 计数器结果："+  dataMap.get("a6"));
+        log.info("经过 a6 节点，nodeContext="+nodeContext.toSimpleString()+" 计数器结果："+  dataMap.get("a6"));
         if(!dataMap.containsKey("a6")){
             dataMap.put("a6","1");
             throw new IllegalStateException();

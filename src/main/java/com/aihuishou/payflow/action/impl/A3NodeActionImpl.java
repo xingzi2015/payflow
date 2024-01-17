@@ -9,7 +9,7 @@ public class A3NodeActionImpl implements NodeAction {
 
     @Override
     public Object execute(final NodeContext nodeContext) {
-        log.info("经过 a3 节点");
+        log.info("经过 a3 节点，nodeContext="+nodeContext.toSimpleString());
         return "a3";
     }
 }

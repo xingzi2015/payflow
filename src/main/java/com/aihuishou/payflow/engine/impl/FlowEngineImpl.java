@@ -3,6 +3,7 @@ package com.aihuishou.payflow.engine.impl;
 import com.aihuishou.payflow.action.NodeAction;
 import com.aihuishou.payflow.engine.FlowContext;
 import com.aihuishou.payflow.engine.FlowEngine;
+import com.aihuishou.payflow.enums.StatusEnum;
 import com.aihuishou.payflow.model.context.NodeContext;
 import com.aihuishou.payflow.model.mq.NodeMessage;
 import com.aihuishou.payflow.model.param.Flow;
@@ -43,15 +44,18 @@ public class FlowEngineImpl implements FlowEngine {
     public void execute(String flowName, Map<String, Object> dataMap) {
 
         Flow flow = FlowContext.getFlow(flowName);
+        String flowId = UUID.randomUUID().toString().substring(0,8);
         FlowNode flowNode = flow.getStartNode();
         NodeContext nodeContext = NodeContext.builder()
-            .executeId(UUID.randomUUID().toString())
+            .executeId(UUID.randomUUID().toString().substring(0,8))
+            .flowExecuteId(flowId)
             .dataMap(dataMap)
             .tryTimes(0)
             .delayLevel(flowNode.getDelayLevel())
             .build();
         //TODO 数据库插入 FLOW
-        log.info("开始执行");
+        log.info("开始执行,id=" + nodeContext.getFlowExecuteId());
+        FlowContext.getFlowHandlers().forEach(flowHandler -> flowHandler.preHandle(flowId, nodeContext.getExecuteId(), flow));
         executeNextNode(List.of(Pair.of(flowNode, nodeContext)));
     }
 
@@ -59,11 +63,10 @@ public class FlowEngineImpl implements FlowEngine {
 
         NodeAction nodeAction = node.getNodeAction();
         try {
-            //TODO 幂等逻辑，前置AOP 操作，数据库插入 NODE
-            FlowContext.getActionPreHandlers().forEach(actionPreHandler -> actionPreHandler.preHandle(node,nodeContext));
+            FlowContext.getNodePreHandlers().forEach(actionPreHandler -> actionPreHandler.preHandle(node, nodeContext));
             Object result = nodeAction.execute(nodeContext);
-            //TODO 后置 AOP 操作,数据库更新 NODE 状态=成功
-            FlowContext.getActionPostHandlers().forEach(actionPreHandler -> actionPreHandler.postHandle(node,nodeContext));
+            FlowContext.getNodePostHandlers()
+                .forEach(actionPreHandler -> actionPreHandler.postHandle(node, nodeContext));
 
             nodeContext.setActionResult(result);
             //执行成功，再次初始化延迟
@@ -82,24 +85,30 @@ public class FlowEngineImpl implements FlowEngine {
                 executeNextNode(List.of(Pair.of(node, nodeContext)));
             } else {
                 //TODO 数据库更新，NODE 状态=失败， FLOW 状态=失败
+                FlowContext.getFlowHandlers()
+                    .forEach(flowHandler -> flowHandler.exceptionHandle(nodeContext.getFlowExecuteId(), e));
+
                 log.error("节点执行失败");
             }
             return;
         }
         if (node.getEnd()) {
             //TODO 数据库更新 FLOW 状态=成功
-            log.info("执行成功");
+            FlowContext.getFlowHandlers()
+                .forEach(flowHandler -> flowHandler.postHandle(nodeContext.getFlowExecuteId(), StatusEnum.SUCCESS));
+            log.info("执行成功,id=" + nodeContext.getFlowExecuteId());
             return;
         }
         List<FlowNode> flowNodes = matchNextNode(node.getConditions(), nodeContext);
         if (flowNodes.isEmpty()) {
             log.warn("未满足任何条件，执行错误");
         } else {
-
             List<Pair<FlowNode, NodeContext>> nodePairs = flowNodes.stream()
                 .map(flowNode -> Pair.of(flowNode,
                     NodeContext.builder()
-                        .executeId(UUID.randomUUID().toString())
+                        .executeId(UUID.randomUUID().toString().substring(0,8))
+                        .preExecuteId(nodeContext.getExecuteId())
+                        .flowExecuteId(nodeContext.getFlowExecuteId())
                         .previousNode(nodeContext)
                         .preResult(nodeContext.getActionResult())
                         .dataMap(nodeContext.getDataMap())

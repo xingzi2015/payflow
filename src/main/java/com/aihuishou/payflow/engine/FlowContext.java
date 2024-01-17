@@ -4,8 +4,9 @@ import com.aihuishou.payflow.action.NodeAction;
 import com.aihuishou.payflow.action.NodeConditionAction;
 import com.aihuishou.payflow.algorithm.RetryAlgorithm;
 import com.aihuishou.payflow.engine.FlowParam.Runner;
-import com.aihuishou.payflow.handler.ActionPostHandler;
-import com.aihuishou.payflow.handler.ActionPreHandler;
+import com.aihuishou.payflow.handler.FlowHandler;
+import com.aihuishou.payflow.handler.NodePostHandler;
+import com.aihuishou.payflow.handler.NodePreHandler;
 import com.aihuishou.payflow.model.param.Flow;
 import com.aihuishou.payflow.model.param.FlowNode;
 import com.aihuishou.payflow.model.param.NodeCondition;
@@ -41,9 +42,11 @@ public class FlowContext {
     private static Map<String, FlowNode> flowNodeMap;
 
     @Getter
-    private static List<ActionPreHandler> actionPreHandlers;
+    private static List<NodePreHandler> nodePreHandlers;
     @Getter
-    private static List<ActionPostHandler> actionPostHandlers;
+    private static List<NodePostHandler> nodePostHandlers;
+    @Getter
+    private static List<FlowHandler> flowHandlers;
 
     /**
      * 加载 FLow
@@ -106,11 +109,14 @@ public class FlowContext {
 
 
     private void initHandler() {
-        Map<String, ActionPreHandler> actionPreHandlerMap = applicationContext.getBeansOfType(ActionPreHandler.class);
-        actionPreHandlers = actionPreHandlerMap.values().stream().toList();
+        Map<String, NodePreHandler> actionPreHandlerMap = applicationContext.getBeansOfType(NodePreHandler.class);
+        nodePreHandlers = actionPreHandlerMap.values().stream().toList();
 
-        Map<String, ActionPostHandler> actionPostHandlerMap = applicationContext.getBeansOfType(ActionPostHandler.class);
-        actionPostHandlers = actionPostHandlerMap.values().stream().toList();
+        Map<String, NodePostHandler> actionPostHandlerMap = applicationContext.getBeansOfType(NodePostHandler.class);
+        nodePostHandlers = actionPostHandlerMap.values().stream().toList();
+
+        Map<String, FlowHandler> flowHandlerMap = applicationContext.getBeansOfType(FlowHandler.class);
+        flowHandlers = flowHandlerMap.values().stream().toList();
     }
 
     public static Flow getFlow(String flowName) {

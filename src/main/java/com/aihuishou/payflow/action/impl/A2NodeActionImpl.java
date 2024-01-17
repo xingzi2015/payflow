@@ -11,7 +11,7 @@ public class A2NodeActionImpl implements NodeAction {
 
     @Override
     public Object execute(final NodeContext nodeContext) {
-        log.info("经过 a2 节点" + nodeContext.getPreResult());
+        log.info("经过 a2 节点，nodeContext="+nodeContext.toSimpleString());
         if (nodeContext.getPreResult() instanceof Integer) {
             return (Integer) nodeContext.getPreResult() + 1;
         } else {
