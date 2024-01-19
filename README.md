@@ -14,9 +14,9 @@ pay-flow:
   runner:
     create-exp: 线程池
   flow-handlers:
-  - create-exp: 流程前置/后置处理
+  - create-exp: 流程前置/后置处理，需要实现[NodeHandler.java]
   node-handlers:
-    - create-exp: 节点前置/后置处理
+    - create-exp: 节点前置/后置处理，需要实现[FlowHandler.java]
   flows:
     - id: 流程 ID
       nodes:
