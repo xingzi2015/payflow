@@ -12,9 +12,9 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class SpelEvaluator implements ElEvaluator {
 
-    private static StandardEvaluationContext context = new StandardEvaluationContext();
-    private static ExpressionParser parser = new SpelExpressionParser();
-    private static Map<String, Expression> cacheMap = new ConcurrentHashMap();
+    private static final StandardEvaluationContext context = new StandardEvaluationContext();
+    private static final ExpressionParser parser = new SpelExpressionParser();
+    private static final Map<String, Expression> cacheMap = new ConcurrentHashMap<>();
 
     @Override
     public <T> T evalWithDefaultContext(final String exp, final Object root, final boolean cache) {

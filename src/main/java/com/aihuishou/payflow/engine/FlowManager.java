@@ -13,7 +13,6 @@ import com.aihuishou.payflow.model.parser.FlowParser;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -35,7 +34,6 @@ public class FlowManager {
 
     private final FlowParam flowParam;
     private final FlowParser flowParser;
-    private final ApplicationContext applicationContext;
 
     @Getter
     private static Executor defaultExecutor;
