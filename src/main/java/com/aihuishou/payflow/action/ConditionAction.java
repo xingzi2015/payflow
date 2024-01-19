@@ -2,7 +2,7 @@ package com.aihuishou.payflow.action;
 
 import com.aihuishou.payflow.model.context.NodeContext;
 
-public interface NodeConditionAction {
+public interface ConditionAction {
     boolean evaluate(NodeContext nodeContext);
 
 }

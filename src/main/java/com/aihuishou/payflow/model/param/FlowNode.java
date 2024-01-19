@@ -34,6 +34,6 @@ public class FlowNode implements Serializable {
     @JsonIgnore
     private RetryAlgorithm retryAlgorithm;
     //流程名称
-    private String flowName;
+    private String flowId;
 
 }

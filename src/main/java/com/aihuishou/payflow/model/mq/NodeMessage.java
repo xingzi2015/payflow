@@ -15,5 +15,5 @@ public class NodeMessage {
     private Object preResult;
     private Map<String, Object> dataMap;
     private Integer tryTimes;
-    private String flowName;
+    private String flowId;
 }

@@ -1,30 +1,36 @@
 pay-flow:
   runner:
     create-exp: 'T(java.util.concurrent.Executors).newFixedThreadPool(2)'
+  node-handlers:
+    - create-exp: 'new com.aihuishou.payflow.handler.impl.DefaultNodeHandler()'
+  flow-handlers:
+    - create-exp: 'new com.aihuishou.payflow.handler.impl.DefaultFlowHandler()'
   flows:
-    - name: 'flow1'
+    - id: 'flow1'
       nodes:
         - id: 'a1'
           start: true
           create-exp: 'new com.aihuishou.payflow.action.impl.A1NodeActionImpl()'
           conditions:
-            - node-whens:
+            - when-nodes:
                 - create-exp: 'new com.aihuishou.payflow.action.impl.ToA2ConditionAction()'
               to-nodes:
                 - 'a2'
-            - node-whens:
+            - when-nodes:
+                #需要支持多种判断，简单的 el 和 ConditionAction
                 - create-exp: 'new com.aihuishou.payflow.action.impl.ToA3ConditionAction()'
+                - simple-exp: 'actionResult == "a1 to a3"'
               to-nodes:
                 - 'a3'
         - id: 'a2'
           create-exp: 'new com.aihuishou.payflow.action.impl.A2NodeActionImpl()'
           end: false
           conditions:
-            - node-whens:
+            - when-nodes:
                 - create-exp: 'new com.aihuishou.payflow.action.impl.ToA6ConditionAction()'
               to-nodes:
                 - 'a2'
-            - node-whens:
+            - when-nodes:
                 - create-exp: 'new com.aihuishou.payflow.action.impl.ToA6ConditionAction()'
                   is-negated: true
               to-nodes:
@@ -33,7 +39,7 @@ pay-flow:
           create-exp: 'new com.aihuishou.payflow.action.impl.A3NodeActionImpl()'
           delay-level: 1
           conditions:
-            - node-whens:
+            - when-nodes:
                 - create-exp: 'new com.aihuishou.payflow.action.impl.ToA4A5ConditionAction()'
               to-nodes:
                 - 'a4'

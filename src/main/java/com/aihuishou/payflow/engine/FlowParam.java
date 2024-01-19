@@ -14,11 +14,25 @@ public class FlowParam implements Serializable {
 
     private Runner runner;
 
+    private NodeHandler[] nodeHandlers;
+
+    private FlowHandler[] flowHandlers;
+
     private Flow[] flows;
 
     @Data
     public static class Runner{
         String id;
+        String createExp;
+    }
+
+    @Data
+    public static class NodeHandler{
+        String createExp;
+    }
+
+    @Data
+    public static class FlowHandler{
         String createExp;
     }
 }

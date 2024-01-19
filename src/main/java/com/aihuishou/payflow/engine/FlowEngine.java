@@ -7,7 +7,7 @@ import java.util.Map;
  */
 public interface FlowEngine {
 
-    void execute(String flowName, Map<String, Object> dataMap);
+    void execute(String flowId, Map<String, Object> dataMap);
 
     void handleMQMessage(String receiveMessage);
 

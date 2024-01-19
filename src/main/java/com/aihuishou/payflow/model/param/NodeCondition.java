@@ -10,7 +10,7 @@ import java.util.List;
 @Data
 public class NodeCondition implements Serializable {
     //条件
-    private NodeWhen[] nodeWhens;
+    private NodeWhen[] whenNodes;
     //下个节点
     private String[] toNodes;
 
@@ -21,7 +21,7 @@ public class NodeCondition implements Serializable {
     @Override
     public String toString() {
         return "NodeCondition{" +
-            "nodeWhens=" + Arrays.toString(nodeWhens) +
+            "nodeWhens=" + Arrays.toString(whenNodes) +
             ", toNodes=" + Arrays.toString(toNodes) +
             '}';
     }
