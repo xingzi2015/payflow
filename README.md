@@ -39,5 +39,5 @@ pay-flow:
 
 
 ## 主要流程图如下
-![](/Users/liusijun133919/IdeaProjects/payflow/src/main/resources/image/flow_readme.png)
+![](src/main/resources/image/flow_readme.png)
 其中绿色处皆可扩展
